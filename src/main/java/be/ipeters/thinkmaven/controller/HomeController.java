@@ -1,4 +1,4 @@
-package be.ipeters.thinkmaven;
+package be.ipeters.thinkmaven.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
