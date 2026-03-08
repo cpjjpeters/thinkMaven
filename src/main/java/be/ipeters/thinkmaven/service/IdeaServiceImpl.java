@@ -21,7 +21,9 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaDto getIdeaById(Long id) {
-        return null;
+        return this.ideaRepository.findById(id)
+                .map(this.ideaMapper::toDto)
+                .orElseThrow();
     }
     private final IdeaRepository ideaRepository;
     private final IdeaMapper ideaMapper;
@@ -46,7 +48,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public void deleteIdea(IdeaDto ideaDto) {
-
+        this.ideaRepository.delete(ideaMapper.toEntity(ideaDto));
     }
 
     @Override
