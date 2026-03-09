@@ -5,7 +5,6 @@ import be.ipeters.thinkmaven.mapper.IdeaMapper;
 import be.ipeters.thinkmaven.model.IdeaDto;
 import be.ipeters.thinkmaven.repository.IdeaRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +12,8 @@ import java.util.List;
 @Slf4j
 @Service
 public class IdeaServiceImpl implements IdeaService {
+    private final IdeaRepository ideaRepository;
+    private final IdeaMapper ideaMapper;
 
     public IdeaServiceImpl(IdeaRepository ideaRepository, IdeaMapper ideaMapper) {
         this.ideaRepository = ideaRepository;
@@ -25,8 +26,6 @@ public class IdeaServiceImpl implements IdeaService {
                 .map(this.ideaMapper::toDto)
                 .orElseThrow();
     }
-    private final IdeaRepository ideaRepository;
-    private final IdeaMapper ideaMapper;
 
     @Override
     public IdeaDto saveIdea(IdeaDto ideaDto) {
@@ -37,27 +36,39 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
+    public String addIdea(IdeaDto ideaDto) {
+        IdeaEntity ideaEntity = this.ideaRepository.save(ideaMapper.toEntity(ideaDto));
+        log.debug("Idea added successfully ");
+        return "Idea added with ID: " + ideaEntity.getId();
+    }
+    @Override
     public IdeaDto updateIdea(IdeaDto ideaDto) {
-        return null;
+        if (ideaDto.getId() == null) {
+            throw new IllegalArgumentException("Idea ID must not be null for update");
+        }
+        IdeaEntity ideaEntity = this.ideaRepository.findById(ideaDto.getId())
+                .orElseThrow(() -> new RuntimeException("Idea not found with id: " + ideaDto.getId()));
+        
+        ideaEntity.setIdea(ideaDto.getIdea());
+        ideaEntity.setDescription(ideaDto.getDescription());
+        ideaEntity.setAuthor(ideaDto.getAuthor());
+        ideaEntity.setCategory(ideaDto.getCategory());
+        
+        final IdeaEntity updatedEntity = this.ideaRepository.save(ideaEntity);
+        log.debug("Idea updated successfully ");
+        return ideaMapper.toDto(updatedEntity);
     }
 
     @Override
     public void deleteIdeaById(Long id) {
-
-    }
-
-    @Override
-    public void deleteIdea(IdeaDto ideaDto) {
-        this.ideaRepository.delete(ideaMapper.toEntity(ideaDto));
+        this.ideaRepository.deleteById(id);
     }
 
     @Override
     public List<IdeaDto> getAllIdeas() {
-        return List.of();
+        return this.ideaRepository.findAll().stream()
+                .map(this.ideaMapper::toDto)
+                .toList();
     }
 
-    @Override
-    public String addIdea(IdeaDto ideaDto) {
-        return "";
-    }
 }

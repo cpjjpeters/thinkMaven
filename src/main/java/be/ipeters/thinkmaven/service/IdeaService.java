@@ -7,10 +7,11 @@ import java.util.List;
 
 public interface IdeaService {
     IdeaDto getIdeaById(Long id);
-    IdeaDto saveIdea(IdeaDto ideaDto);
     IdeaDto updateIdea(IdeaDto ideaDto);
     void deleteIdeaById(Long id);
-    void deleteIdea(IdeaDto ideaDto);
     List<IdeaDto> getAllIdeas() ;
+
+    IdeaDto saveIdea(IdeaDto ideaDto);
+
     String addIdea(IdeaDto ideaDto);
 }
